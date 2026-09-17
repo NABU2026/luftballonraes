@@ -568,7 +568,21 @@
 
 <a class="ticket-btn" href="https://docs.google.com/spreadsheets/d/1PoNH6VWWGURNZs5f2fR3kP0OY7Y1tmeia5AfCPthioY/edit?usp=sharing" target="_blank" rel="noopener">📊 Åbn regneark</a>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBD2emaOHRSyN9-6hQk9_s8Cjdhi51d2tY",
+  authDomain: "luftballonraes.firebaseapp.com",
+  projectId: "luftballonraes",
+  storageBucket: "luftballonraes.firebasestorage.app",
+  messagingSenderId: "927321083059",
+  appId: "1:927321083059:web:4ca40945156dc75161b4c6"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
 (function(){
   "use strict";
 
@@ -654,149 +668,13 @@
     return h + 't ' + m + 'm';
   }
 
-  // ---------- Remote store: read-only view onto a Google Apps Script Web App
-  // that serves a Google Sheet. All editing now happens directly in the sheet
-  // (Google Sheets already handles multiple people editing at once); this page
-  // only ever issues GET requests. ----------
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyFc59lu1B_9tU7uiAfaLRSPdwt0DsHg6w64q1uWUyO4cFUUU3BPYVe0Mk_qujUXAX/exec';
+  // ---------- Remote store: thin adapter over Firebase Firestore, kept in
+  // the same collection().orderBy().limit().onSnapshot() shape the rest of
+  // this file expects, so nothing below this had to change. Firestore pushes
+  // updates in real time — no polling interval needed.
+  function FirestoreStore(){}
 
-  // Apps Script's own response time is a delay we can't touch from the
-  // client, so we hide it: the last good snapshot is kept in localStorage and
-  // reloaded instantly on next visit, while a real fetch quietly refreshes it.
-  const REMOTE_CACHE_KEY = 'derby_cache_v1';
-  function loadCachedSnapshot(){
-    try{
-      const raw = localStorage.getItem(REMOTE_CACHE_KEY);
-      if(!raw) return null;
-      const data = JSON.parse(raw);
-      data.people = data.people || [];
-      data.sessions = data.sessions || [];
-      data.active = data.active || [];
-      return data;
-    }catch(e){ return null; }
-  }
-  function saveCachedSnapshot(data){
-    try{ localStorage.setItem(REMOTE_CACHE_KEY, JSON.stringify(data)); }catch(e){ /* quota or private mode: ignore */ }
-  }
-
-  // A tiny Firestore-like read shim (collection/onSnapshot) backed by the
-  // Apps Script Web App, kept in sync by polling.
-  function RemoteStore(){
-    const seeded = loadCachedSnapshot();
-    this.cache = seeded; // { people: [...], sessions: [...], active: [...] } — arrays of {id, ...}
-    this._cacheIsStale = !!seeded; // seeded from localStorage: shown instantly, but needs a real refresh
-    this._cachePromise = null; // in-flight initial fetch, shared by every concurrent caller
-    this.subs = [];
-    this.pollTimer = null;
-    // Reads only now (no more writes competing for the same quota), and
-    // multiple people may have this dashboard open at once — fast enough to
-    // feel live, slow enough to keep concurrent-request collisions rare
-    // (measured: 2 simultaneous calls to this backend already take ~3x as
-    // long as one, and 3 can fail outright, so "instant" isn't realistic).
-    this.pollMs = 4000;
-    this.lastSerialized = null;
-    this._visibilityBound = false;
-    this._queue = Promise.resolve(); // every request to Apps Script runs through here, strictly one at a time
-  }
-
-  // Even for reads-only, two requests fired from this same tab at once would
-  // still queue up expensively on the backend — so they're still funneled
-  // through one at a time.
-  RemoteStore.prototype._enqueue = function(taskFn){
-    const run = () => taskFn();
-    const result = this._queue.then(run, run);
-    this._queue = result.catch(() => {});
-    return result;
-  };
-
-  RemoteStore.prototype._fetchRemote = function(){
-    return this._enqueue(async () => {
-      const res = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
-      if(!res.ok) throw new Error('fetch_failed_' + res.status);
-      const data = await res.json();
-      data.people = data.people || [];
-      data.sessions = data.sessions || [];
-      data.active = data.active || [];
-      return data;
-    });
-  };
-
-  // The people listener and the sessions listener both ask for the initial
-  // data at page load, before either has actually arrived — without
-  // de-duping, each would fire its own GET simultaneously. Now they share the
-  // one in-flight fetch.
-  RemoteStore.prototype._ensureCache = function(){
-    if(this.cache) return Promise.resolve(this.cache);
-    if(!this._cachePromise){
-      const self = this;
-      this._cachePromise = this._fetchRemote().then(data => {
-        self.cache = data;
-        self._cacheIsStale = false;
-        self._cachePromise = null;
-        return data;
-      }).catch(err => {
-        self._cachePromise = null;
-        throw err;
-      });
-    }
-    return this._cachePromise;
-  };
-
-  RemoteStore.prototype._docsFor = function(sub){
-    const arr = (this.cache && this.cache[sub.collectionName]) || [];
-    let entries = arr.slice();
-    if(sub.orderField){
-      entries.sort((a, b) => {
-        const av = (a && a[sub.orderField]) || '';
-        const bv = (b && b[sub.orderField]) || '';
-        if(av < bv) return sub.orderDir === 'desc' ? 1 : -1;
-        if(av > bv) return sub.orderDir === 'desc' ? -1 : 1;
-        return 0;
-      });
-    }
-    if(sub.limitN){ entries = entries.slice(0, sub.limitN); }
-    return entries.map(item => ({ id: item.id, data: () => item }));
-  };
-
-  RemoteStore.prototype._notifyAll = function(){
-    if(this.cache) saveCachedSnapshot(this.cache);
-    this.subs.forEach(sub => {
-      try{ sub.cb({ docs: this._docsFor(sub) }); }catch(e){ /* ignore render errors */ }
-    });
-  };
-
-  RemoteStore.prototype._pollTick = async function(){
-    if(document.hidden) return; // no point polling a tab nobody's looking at
-    try{
-      const fresh = await this._fetchRemote();
-      this._cacheIsStale = false;
-      const serialized = JSON.stringify(fresh);
-      if(serialized !== this.lastSerialized){
-        this.lastSerialized = serialized;
-        this.cache = fresh;
-        this._notifyAll();
-      }
-    }catch(e){ /* transient network hiccup: try again next tick */ }
-  };
-
-  RemoteStore.prototype._startPolling = function(){
-    if(this.pollTimer) return;
-    const self = this;
-    // The page may have painted instantly from a localStorage snapshot — that
-    // snapshot is stale by definition, so refresh it right away instead of
-    // waiting up to pollMs for the first interval tick.
-    if(this._cacheIsStale){ this._pollTick(); }
-    this.pollTimer = setInterval(() => self._pollTick(), this.pollMs);
-    if(!this._visibilityBound){
-      this._visibilityBound = true;
-      document.addEventListener('visibilitychange', () => {
-        if(!document.hidden) self._pollTick();
-      });
-    }
-  };
-
-  RemoteStore.prototype.collection = function(name){
-    const self = this;
+  FirestoreStore.prototype.collection = function(name){
     const ref = {
       _orderField: null,
       _orderDir: 'asc',
@@ -804,11 +682,13 @@
       orderBy(field, dir){ this._orderField = field; this._orderDir = dir || 'asc'; return this; },
       limit(n){ this._limitN = n; return this; },
       onSnapshot(cb, errCb){
-        const sub = { collectionName: name, cb: cb, errCb: errCb, orderField: ref._orderField, orderDir: ref._orderDir, limitN: ref._limitN };
-        self.subs.push(sub);
-        self._ensureCache().then(() => self._notifyAll()).catch(e => { if(errCb) errCb(e); });
-        self._startPolling();
-        return () => { self.subs = self.subs.filter(s => s !== sub); };
+        const constraints = [];
+        if(ref._orderField) constraints.push(orderBy(ref._orderField, ref._orderDir === 'desc' ? 'desc' : 'asc'));
+        if(ref._limitN) constraints.push(limit(ref._limitN));
+        const q = query(collection(db, name), ...constraints);
+        return onSnapshot(q, snap => {
+          cb({ docs: snap.docs.map(d => ({ id: d.id, data: () => d.data() })) });
+        }, errCb);
       },
     };
     return ref;
@@ -1122,7 +1002,7 @@
   }
 
   function init(){
-    attachStore(new RemoteStore());
+    attachStore(new FirestoreStore());
   }
   init();
 
