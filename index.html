@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luftballonræs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Mulish:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light dark;
+    --page-bg:#E9F1E4;
+    --paper:#FBF7EA;
+    --paper-raised:#FFFFFB;
+    --turf:#6B4A34;
+    --turf-dark:#4A3121;
+    --turf-line:rgba(255,255,255,0.28);
+    --ink:#22301E;
+    --ink-soft:#5C6B52;
+    --burgundy:#C6446B;
+    --burgundy-dark:#8C2F4D;
+    --brass:#B4872A;
+    --brass-soft:#E7CE87;
+    --rail:#8B5E34;
+    --rail-dark:#6B4726;
+    --shadow:rgba(33,27,18,0.20);
+    --silver:#8B9096;
+    --bronze:#A8672F;
+    --leaf:#4C8A57;
+    --leaf-dark:#2F5C39;
+    --sky1:#CFEAF6;
+    --sky2:#EFF8ED;
+    --sky-deep:#7FC1E8;
+    --grass1:#79B36B;
+    --grass2:#5F9C57;
+    --font-display:'Fraunces', 'Iowan Old Style', Georgia, serif;
+    --font-body:'Mulish', 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-mono:'Space Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --page-bg:#10160F;
+      --paper:#1D2318;
+      --paper-raised:#242B1E;
+      --turf:#3A2A1C;
+      --turf-dark:#241609;
+      --turf-line:rgba(255,255,255,0.14);
+      --ink:#EAF0E2;
+      --ink-soft:#AFBBA2;
+      --burgundy:#E97C9C;
+      --burgundy-dark:#B23F5C;
+      --brass:#E4C25D;
+      --brass-soft:#F3DE9C;
+      --rail:#6B4726;
+      --rail-dark:#4A2F18;
+      --shadow:rgba(0,0,0,0.55);
+      --silver:#AEB4BB;
+      --bronze:#C98A55;
+      --leaf:#6FBE7C;
+      --leaf-dark:#3F7D4C;
+      --sky1:#1C2E38;
+      --sky2:#16241C;
+      --sky-deep:#2E5A78;
+      --grass1:#3C6B3E;
+      --grass2:#2E5432;
+    }
+  }
+  :root[data-theme="dark"]{
+    --page-bg:#10160F;
+    --paper:#1D2318;
+    --paper-raised:#242B1E;
+    --turf:#3A2A1C;
+    --turf-dark:#241609;
+    --turf-line:rgba(255,255,255,0.14);
+    --ink:#EAF0E2;
+    --ink-soft:#AFBBA2;
+    --burgundy:#E97C9C;
+    --burgundy-dark:#B23F5C;
+    --brass:#E4C25D;
+    --brass-soft:#F3DE9C;
+    --rail:#6B4726;
+    --rail-dark:#4A2F18;
+    --shadow:rgba(0,0,0,0.55);
+    --silver:#AEB4BB;
+    --bronze:#C98A55;
+    --leaf:#6FBE7C;
+    --leaf-dark:#3F7D4C;
+    --sky1:#1C2E38;
+    --sky2:#16241C;
+    --sky-deep:#2E5A78;
+    --grass1:#3C6B3E;
+    --grass2:#2E5432;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  html{font-size:112.5%;} /* scales the whole rem-based type/spacing system up a bit */
+  body{
+    background:var(--page-bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:1000px;
+    margin:0 auto;
+    padding:1.5rem 1rem 7rem;
+  }
+  h1,h2{margin:0;}
+  a{color:inherit;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:1rem;
+    margin-bottom:1.25rem;
+    padding-bottom:1rem;
+    border-bottom:2px solid var(--rail);
+  }
+  .wordmark{
+    font-family:var(--font-display);
+    font-size:clamp(2.4rem, 6vw, 3.4rem);
+    letter-spacing:0.02em;
+    color:var(--burgundy);
+    line-height:0.95;
+  }
+  .tagline{
+    margin:0.2rem 0 0;
+    color:var(--ink-soft);
+    font-size:0.95rem;
+    max-width:34ch;
+  }
+  .week-nav{
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+    background:var(--paper-raised);
+    border:1px solid var(--rail);
+    border-radius:999px;
+    padding:0.25rem;
+    box-shadow:0 2px 0 var(--shadow);
+  }
+  .week-arrow{
+    width:2rem;
+    height:2rem;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    color:var(--burgundy);
+    font-size:1.2rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .week-arrow:hover{background:var(--brass-soft);}
+  .week-select{
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    padding:0.3rem 0.2rem;
+    max-width:15rem;
+  }
+
+  /* ---------- Sky panel (hero) ---------- */
+  .track-panel{
+    position:relative;
+    background:var(--paper);
+    border-radius:16px;
+    padding:1rem;
+    box-shadow:0 10px 0 var(--rail-dark), 0 14px 24px var(--shadow);
+    margin-bottom:1.75rem;
+  }
+  .bed-field{
+    position:relative;
+    width:100%;
+    aspect-ratio:3 / 4;
+    border-radius:10px;
+    border:10px solid var(--rail);
+    overflow:hidden;
+    box-shadow:
+      inset 0 0 0 2px rgba(0,0,0,0.12),
+      inset 0 3px 10px rgba(255,255,255,0.18),
+      inset 0 -10px 22px rgba(0,0,0,0.18);
+    background:linear-gradient(180deg, var(--sky1) 0%, var(--sky-deep) 85%, var(--sky-deep) 100%);
+  }
+  .bed-ground{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:8%;
+    background:repeating-linear-gradient(100deg, var(--grass1) 0 11%, var(--grass2) 11% 22%);
+    box-shadow:0 -2px 6px rgba(0,0,0,0.15) inset;
+    z-index:1;
+  }
+  .cloud{
+    position:absolute;
+    border-radius:999px;
+  }
+  .cloud-a{
+    top:14%; left:10%; width:3.4rem; height:1.4rem;
+    background:
+      radial-gradient(circle at 28% 65%, rgba(255,255,255,0.92) 0 48%, transparent 50%),
+      radial-gradient(circle at 55% 30%, rgba(255,255,255,0.95) 0 58%, transparent 60%),
+      radial-gradient(circle at 80% 65%, rgba(255,255,255,0.88) 0 42%, transparent 44%);
+  }
+  .cloud-b{
+    top:38%; right:12%; width:2.6rem; height:1.1rem;
+    background:
+      radial-gradient(circle at 25% 65%, rgba(255,255,255,0.9) 0 46%, transparent 48%),
+      radial-gradient(circle at 55% 32%, rgba(255,255,255,0.92) 0 55%, transparent 57%),
+      radial-gradient(circle at 80% 62%, rgba(255,255,255,0.85) 0 40%, transparent 42%);
+  }
+  .cloud-c{
+    top:64%; left:16%; width:2.2rem; height:0.9rem;
+    background:
+      radial-gradient(circle at 25% 65%, rgba(255,255,255,0.85) 0 46%, transparent 48%),
+      radial-gradient(circle at 55% 32%, rgba(255,255,255,0.88) 0 55%, transparent 57%),
+      radial-gradient(circle at 80% 62%, rgba(255,255,255,0.8) 0 40%, transparent 42%);
+  }
+  .bed-deco{
+    position:absolute;
+    z-index:1;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,0.2));
+  }
+  .deco-bird{
+    font-size:1.1rem;
+    animation:flutter 4s ease-in-out infinite;
+  }
+  @keyframes flutter{
+    0%,100%{ transform:translate(0,0) rotate(-6deg); }
+    50%{ transform:translate(-0.6rem,-0.3rem) rotate(6deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .deco-bird{animation:none;}
+  }
+  .bed-sun{
+    position:absolute;
+    top:0.4rem; right:0.8rem;
+    font-size:1.7rem;
+    z-index:2;
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+  }
+  .bed-sun::before{
+    content:"";
+    position:absolute;
+    inset:-0.7rem;
+    background:radial-gradient(circle, rgba(255,224,130,0.65), transparent 70%);
+    z-index:-1;
+    border-radius:50%;
+  }
+  .balloon{
+    position:absolute;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    transform:translate(-50%, -50%);
+    transition:left 0.9s ease, top 0.9s cubic-bezier(.4,0.9,.4,1);
+    z-index:3;
+  }
+  .balloon-svg{
+    display:block;
+    animation:bob 3.2s ease-in-out infinite;
+    filter:drop-shadow(0 4px 4px rgba(0,0,0,0.32));
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0) rotate(-2deg); }
+    50%{ transform:translateY(-5px) rotate(2deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .balloon-svg{animation:none;}
+    .balloon{transition:none;}
+  }
+  .balloon-label{
+    position:relative;
+    margin-top:0.3rem;
+    background:rgba(255,255,255,0.94);
+    color:var(--ink);
+    font-size:0.66rem;
+    font-weight:700;
+    padding:0.12rem 0.45rem;
+    border-radius:999px;
+    border:1px solid rgba(0,0,0,0.08);
+    white-space:nowrap;
+    display:flex;
+    align-items:center;
+    gap:0.3rem;
+    box-shadow:0 2px 4px rgba(0,0,0,0.25);
+  }
+  .balloon-label::before{
+    content:"";
+    position:absolute;
+    top:-5px; left:50%;
+    transform:translateX(-50%);
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-bottom:5px solid rgba(255,255,255,0.94);
+  }
+  .balloon-label .label-time{
+    font-family:var(--font-mono);
+    font-weight:400;
+    color:var(--ink-soft);
+  }
+  .track-empty{
+    position:absolute;
+    inset:1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#fff;
+    font-size:0.95rem;
+    padding:1.5rem;
+    background:rgba(0,0,0,0.15);
+    border-radius:10px;
+    z-index:4;
+  }
+  .track-empty[hidden]{
+    display:none;
+  }
+
+  /* ---------- Panels ---------- */
+  .panel{
+    background:var(--paper);
+    border:1px solid var(--rail);
+    border-radius:12px;
+    padding:1.1rem 1.2rem 1.3rem;
+    margin-bottom:1.25rem;
+  }
+  .panel h2{
+    font-family:var(--font-display);
+    font-size:1.4rem;
+    letter-spacing:0.01em;
+    color:var(--burgundy);
+  }
+  .panel-sub{
+    margin:0.15rem 0 0.9rem;
+    color:var(--ink-soft);
+    font-size:0.82rem;
+    font-family:var(--font-mono);
+  }
+
+  /* ---------- Podium ---------- */
+  .podium{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:0.6rem;
+    min-height:9rem;
+  }
+  .podium-spot{
+    flex:1;
+    max-width:9rem;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:0.3rem;
+  }
+  .medal{
+    width:2.6rem; height:2.6rem;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.5rem;
+    background:var(--paper-raised);
+    border:2px solid var(--rail);
+  }
+  .podium-name{font-weight:600; font-size:0.92rem;}
+  .podium-time{font-family:var(--font-mono); font-size:0.8rem; color:var(--ink-soft);}
+  .podium-block{
+    width:100%;
+    border-radius:6px 6px 0 0;
+    background:var(--paper-raised);
+    border:1px solid var(--rail);
+    border-bottom:none;
+  }
+  .podium-spot.gold{order:2;}
+  .podium-spot.silver{order:1;}
+  .podium-spot.bronze{order:3;}
+  .podium-spot.gold .podium-block{height:3.4rem;}
+  .podium-spot.silver .podium-block{height:2.3rem;}
+  .podium-spot.bronze .podium-block{height:1.4rem;}
+  .podium-empty{
+    color:var(--ink-soft);
+    font-size:0.9rem;
+    text-align:center;
+    width:100%;
+    padding:1.5rem 0;
+  }
+
+  /* ---------- Tote board ---------- */
+  .tote-board{
+    padding:0.2rem 0.9rem;
+    display:flex;
+    flex-direction:column;
+  }
+  .tote-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:0.55rem;
+    padding:0.6rem 0;
+    border-bottom:1px solid rgba(0,0,0,0.1);
+  }
+  .tote-row:last-child{border-bottom:none;}
+  .tote-row-name{
+    color:var(--ink);
+    font-weight:600;
+    font-size:1.25rem;
+    flex:0 0 auto;
+    max-width:40%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .tote-mini-badge{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:flex-end;
+    gap:2px;
+    font-size:1.35rem;
+    line-height:1;
+    min-height:1.1em;
+    max-width:9rem;
+  }
+  .badge-emoji{display:inline-block;}
+  .emoji-progress{
+    position:relative;
+    display:inline-block;
+    width:1em;
+    height:1em;
+  }
+  .emoji-progress .ep-bg{
+    display:block;
+    width:1em;
+    filter:grayscale(100%);
+    opacity:0.32;
+  }
+  .emoji-progress .ep-fg{
+    position:absolute;
+    top:0; left:0;
+    height:1em;
+    overflow:hidden;
+  }
+  .emoji-progress .ep-fg-inner{
+    display:block;
+    width:1em;
+  }
+  .tote-row-values{
+    display:flex;
+    gap:1.75rem;
+    flex:none;
+  }
+  .tote-mini{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:3.2rem;
+  }
+  .tote-mini strong{
+    font-family:var(--font-mono);
+    font-weight:700;
+    color:var(--burgundy-dark);
+    font-size:1.1rem;
+    letter-spacing:0.02em;
+  }
+  .tote-mini small{
+    font-size:0.65rem;
+    color:var(--ink-soft);
+    line-height:1.2;
+  }
+  .tote-empty{
+    color:var(--ink-soft);
+    font-size:0.85rem;
+    text-align:center;
+    padding:1.2rem 0;
+  }
+  .tote-note{
+    margin-top:0.8rem;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+  .tote-note summary{cursor:pointer;}
+  .tote-note p{margin:0.5rem 0 0;}
+
+  /* ---------- Floating sheet-link button ---------- */
+  .ticket-btn{
+    position:fixed;
+    right:1.25rem;
+    bottom:1.25rem;
+    display:inline-block;
+    background:var(--burgundy);
+    color:#fff;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:0.95rem;
+    text-decoration:none;
+    border:2px dashed var(--brass-soft);
+    border-radius:8px;
+    padding:0.85rem 1.2rem;
+    transform:rotate(-3deg);
+    box-shadow:0 6px 14px var(--shadow);
+    cursor:pointer;
+    transition:transform 0.2s ease;
+    z-index:10;
+  }
+  .ticket-btn:hover{transform:rotate(0deg) translateY(-2px);}
+
+  :focus-visible{outline:2px solid var(--burgundy); outline-offset:2px;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header class="masthead">
+    <div>
+      <h1 class="wordmark">Luftballonræs</h1>
+      <p class="tagline">Ugens vigtigste nøgletal: hvor højt flyver din ballon?</p>
+    </div>
+    <div class="week-nav">
+      <button class="week-arrow" id="prevWeek" aria-label="Forrige uge" type="button">‹</button>
+      <select id="weekSelect" class="week-select" aria-label="Vælg uge"></select>
+      <button class="week-arrow" id="nextWeek" aria-label="Næste uge" type="button">›</button>
+    </div>
+  </header>
+
+  <section class="track-panel" aria-label="Luftballonhimmel">
+    <div class="bed-field" id="bedField">
+      <div class="cloud cloud-a"></div>
+      <div class="cloud cloud-b"></div>
+      <div class="cloud cloud-c"></div>
+      <span class="bed-sun">☀️</span>
+      <span class="bed-deco deco-bird" style="top:16%; left:14%;">🕊️</span>
+      <span class="bed-deco deco-bird" style="top:34%; right:10%; animation-delay:1.4s;">🕊️</span>
+      <div class="bed-ground"></div>
+    </div>
+    <p class="track-empty" id="trackEmpty" hidden></p>
+  </section>
+
+  <section class="panel">
+    <h2>Sidste uges højdeflyvere</h2>
+    <p class="panel-sub" id="lastWeekLabel"></p>
+    <div class="podium" id="podium"></div>
+  </section>
+
+  <section class="panel tote-panel">
+    <h2>Ugens forbrænding</h2>
+    <p class="panel-sub" id="toteWeekLabel"></p>
+    <div class="tote-board" id="toteBoard"></div>
+    <details class="tote-note">
+      <summary>Hvordan regner vi det ud?</summary>
+      <p>Vi regner med, at man forbrænder ca. 2,2 kcal i minuttet, mens man står op og arbejder (baseret på Compendium of Physical Activities' MET-værdi for stående arbejde, 1,8 MET, omregnet for en gennemsnitsvægt på 70 kg). En dobbelt café latte med sødmælk er sat til ca. 195 kcal, og "km løbet" bruger tommelfingerreglen om ca. 1 kcal pr. kg kropsvægt pr. km (også her 70 kg, altså ca. 70 kcal/km) — begge dele er gennemsnitstal, ikke facit. Man optjener en fyldt ☕ for hver hele café latte og en fyldt 🏃 for hver hele km — den sidste, endnu ikke fulde, farves gradvist jo tættere man er på den næste.</p>
+    </details>
+  </section>
+
+</div>
+
+<a class="ticket-btn" href="https://docs.google.com/spreadsheets/d/1PoNH6VWWGURNZs5f2fR3kP0OY7Y1tmeia5AfCPthioY/edit?usp=sharing" target="_blank" rel="noopener">📊 Åbn regneark</a>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Date / ISO week helpers ----------
+  const MONTHS_DA = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+
+  // Ræsets første uge. Ingen uger før denne vises nogensinde i ugevælgeren —
+  // uanset hvad der måtte stå i regnearket — og der er ingen øvre grænse:
+  // hver ny uge, der går, lægges automatisk til, for evigt.
+  const START_WEEK_KEY = '2026-W37';
+
+  function isoWeekInfoFromDate(dateObj){
+    const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+    const dayNum = (d.getUTCDay() + 6) % 7;
+    d.setUTCDate(d.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+    const firstDayNum = (firstThursday.getUTCDay() + 6) % 7;
+    firstThursday.setUTCDate(firstThursday.getUTCDate() - firstDayNum + 3);
+    const week = 1 + Math.round((d - firstThursday) / (7*24*3600*1000));
+    return { year: d.getUTCFullYear(), week: week };
+  }
+
+  function weekKeyFromDate(dateObj){
+    const info = isoWeekInfoFromDate(dateObj);
+    return info.year + '-W' + String(info.week).padStart(2,'0');
+  }
+
+  // A date typed straight into Google Sheets comes back from Apps Script as a
+  // full ISO instant (e.g. "2026-09-15T22:00:00.000Z" for a cell that reads
+  // "16-09-2026" in a UTC+2 sheet), not a plain "YYYY-MM-DD" string. Reading
+  // it back with `new Date(...)` and the browser's LOCAL calendar fields
+  // recovers the day the sheet actually shows, as long as viewers are in the
+  // same timezone as the spreadsheet (true for one group looking at one board).
+  function localDatePartsFromValue(dateVal){
+    const str = String(dateVal);
+    if(str.indexOf('T') === -1){
+      return str.split('-').map(Number);
+    }
+    const d = new Date(str);
+    return [d.getFullYear(), d.getMonth() + 1, d.getDate()];
+  }
+
+  function weekKeyFromDateValue(dateVal){
+    const [y, m, d] = localDatePartsFromValue(dateVal);
+    return weekKeyFromDate(new Date(y, m-1, d));
+  }
+
+  function mondayOfISOWeek(year, week){
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const jan4DayNum = (jan4.getUTCDay() + 6) % 7;
+    const monday = new Date(jan4);
+    monday.setUTCDate(jan4.getUTCDate() - jan4DayNum + (week-1)*7);
+    return monday;
+  }
+
+  function parseWeekKey(weekKey){
+    const [yStr, wStr] = weekKey.split('-W');
+    return { year: Number(yStr), week: Number(wStr) };
+  }
+
+  function shiftWeekKey(weekKey, delta){
+    const { year, week } = parseWeekKey(weekKey);
+    const monday = mondayOfISOWeek(year, week);
+    monday.setUTCDate(monday.getUTCDate() + delta*7);
+    return weekKeyFromDate(new Date(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate()));
+  }
+
+  function weekRangeLabel(weekKey){
+    const { year, week } = parseWeekKey(weekKey);
+    const monday = mondayOfISOWeek(year, week);
+    const sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate() + 6);
+    const fmt = (d) => d.getUTCDate() + '. ' + MONTHS_DA[d.getUTCMonth()];
+    return 'Uge ' + week + ' · ' + fmt(monday) + '–' + fmt(sunday);
+  }
+
+  function minutesToLabel(min){
+    min = Math.round(min);
+    if(min <= 0) return '0 min';
+    const h = Math.floor(min/60), m = min%60;
+    if(h === 0) return m + ' min';
+    if(m === 0) return h + ' t';
+    return h + 't ' + m + 'm';
+  }
+
+  // ---------- Remote store: read-only view onto a Google Apps Script Web App
+  // that serves a Google Sheet. All editing now happens directly in the sheet
+  // (Google Sheets already handles multiple people editing at once); this page
+  // only ever issues GET requests. ----------
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyFc59lu1B_9tU7uiAfaLRSPdwt0DsHg6w64q1uWUyO4cFUUU3BPYVe0Mk_qujUXAX/exec';
+
+  // Apps Script's own response time is a delay we can't touch from the
+  // client, so we hide it: the last good snapshot is kept in localStorage and
+  // reloaded instantly on next visit, while a real fetch quietly refreshes it.
+  const REMOTE_CACHE_KEY = 'derby_cache_v1';
+  function loadCachedSnapshot(){
+    try{
+      const raw = localStorage.getItem(REMOTE_CACHE_KEY);
+      if(!raw) return null;
+      const data = JSON.parse(raw);
+      data.people = data.people || [];
+      data.sessions = data.sessions || [];
+      data.active = data.active || [];
+      return data;
+    }catch(e){ return null; }
+  }
+  function saveCachedSnapshot(data){
+    try{ localStorage.setItem(REMOTE_CACHE_KEY, JSON.stringify(data)); }catch(e){ /* quota or private mode: ignore */ }
+  }
+
+  // A tiny Firestore-like read shim (collection/onSnapshot) backed by the
+  // Apps Script Web App, kept in sync by polling.
+  function RemoteStore(){
+    const seeded = loadCachedSnapshot();
+    this.cache = seeded; // { people: [...], sessions: [...], active: [...] } — arrays of {id, ...}
+    this._cacheIsStale = !!seeded; // seeded from localStorage: shown instantly, but needs a real refresh
+    this._cachePromise = null; // in-flight initial fetch, shared by every concurrent caller
+    this.subs = [];
+    this.pollTimer = null;
+    // Reads only now (no more writes competing for the same quota), and
+    // multiple people may have this dashboard open at once — fast enough to
+    // feel live, slow enough to keep concurrent-request collisions rare
+    // (measured: 2 simultaneous calls to this backend already take ~3x as
+    // long as one, and 3 can fail outright, so "instant" isn't realistic).
+    this.pollMs = 4000;
+    this.lastSerialized = null;
+    this._visibilityBound = false;
+    this._queue = Promise.resolve(); // every request to Apps Script runs through here, strictly one at a time
+  }
+
+  // Even for reads-only, two requests fired from this same tab at once would
+  // still queue up expensively on the backend — so they're still funneled
+  // through one at a time.
+  RemoteStore.prototype._enqueue = function(taskFn){
+    const run = () => taskFn();
+    const result = this._queue.then(run, run);
+    this._queue = result.catch(() => {});
+    return result;
+  };
+
+  RemoteStore.prototype._fetchRemote = function(){
+    return this._enqueue(async () => {
+      const res = await fetch(APPS_SCRIPT_URL, { method: 'GET' });
+      if(!res.ok) throw new Error('fetch_failed_' + res.status);
+      const data = await res.json();
+      data.people = data.people || [];
+      data.sessions = data.sessions || [];
+      data.active = data.active || [];
+      return data;
+    });
+  };
+
+  // The people listener and the sessions listener both ask for the initial
+  // data at page load, before either has actually arrived — without
+  // de-duping, each would fire its own GET simultaneously. Now they share the
+  // one in-flight fetch.
+  RemoteStore.prototype._ensureCache = function(){
+    if(this.cache) return Promise.resolve(this.cache);
+    if(!this._cachePromise){
+      const self = this;
+      this._cachePromise = this._fetchRemote().then(data => {
+        self.cache = data;
+        self._cacheIsStale = false;
+        self._cachePromise = null;
+        return data;
+      }).catch(err => {
+        self._cachePromise = null;
+        throw err;
+      });
+    }
+    return this._cachePromise;
+  };
+
+  RemoteStore.prototype._docsFor = function(sub){
+    const arr = (this.cache && this.cache[sub.collectionName]) || [];
+    let entries = arr.slice();
+    if(sub.orderField){
+      entries.sort((a, b) => {
+        const av = (a && a[sub.orderField]) || '';
+        const bv = (b && b[sub.orderField]) || '';
+        if(av < bv) return sub.orderDir === 'desc' ? 1 : -1;
+        if(av > bv) return sub.orderDir === 'desc' ? -1 : 1;
+        return 0;
+      });
+    }
+    if(sub.limitN){ entries = entries.slice(0, sub.limitN); }
+    return entries.map(item => ({ id: item.id, data: () => item }));
+  };
+
+  RemoteStore.prototype._notifyAll = function(){
+    if(this.cache) saveCachedSnapshot(this.cache);
+    this.subs.forEach(sub => {
+      try{ sub.cb({ docs: this._docsFor(sub) }); }catch(e){ /* ignore render errors */ }
+    });
+  };
+
+  RemoteStore.prototype._pollTick = async function(){
+    if(document.hidden) return; // no point polling a tab nobody's looking at
+    try{
+      const fresh = await this._fetchRemote();
+      this._cacheIsStale = false;
+      const serialized = JSON.stringify(fresh);
+      if(serialized !== this.lastSerialized){
+        this.lastSerialized = serialized;
+        this.cache = fresh;
+        this._notifyAll();
+      }
+    }catch(e){ /* transient network hiccup: try again next tick */ }
+  };
+
+  RemoteStore.prototype._startPolling = function(){
+    if(this.pollTimer) return;
+    const self = this;
+    // The page may have painted instantly from a localStorage snapshot — that
+    // snapshot is stale by definition, so refresh it right away instead of
+    // waiting up to pollMs for the first interval tick.
+    if(this._cacheIsStale){ this._pollTick(); }
+    this.pollTimer = setInterval(() => self._pollTick(), this.pollMs);
+    if(!this._visibilityBound){
+      this._visibilityBound = true;
+      document.addEventListener('visibilitychange', () => {
+        if(!document.hidden) self._pollTick();
+      });
+    }
+  };
+
+  RemoteStore.prototype.collection = function(name){
+    const self = this;
+    const ref = {
+      _orderField: null,
+      _orderDir: 'asc',
+      _limitN: null,
+      orderBy(field, dir){ this._orderField = field; this._orderDir = dir || 'asc'; return this; },
+      limit(n){ this._limitN = n; return this; },
+      onSnapshot(cb, errCb){
+        const sub = { collectionName: name, cb: cb, errCb: errCb, orderField: ref._orderField, orderDir: ref._orderDir, limitN: ref._limitN };
+        self.subs.push(sub);
+        self._ensureCache().then(() => self._notifyAll()).catch(e => { if(errCb) errCb(e); });
+        self._startPolling();
+        return () => { self.subs = self.subs.filter(s => s !== sub); };
+      },
+    };
+    return ref;
+  };
+
+  // ---------- App state ----------
+  const state = {
+    people: [],       // [{id, name, color}]
+    sessions: [],      // [{id, name, date, weekKey, startTime, endTime, minutes}]
+    selectedWeekKey: weekKeyFromDate(new Date()),
+    dataLoaded: false,
+  };
+
+  const DEFAULT_BALLOON_COLORS = ['#C0392B','#2471A3','#B7950B','#6C3483','#1E8449','#CA6F1E','#117A65','#943126','#7D6608','#1A5276','#B23F5C','#2E7D6B','#B4622B','#5B4E9C'];
+  function defaultColorFor(name){
+    let hash = 0;
+    for(let i=0;i<name.length;i++){ hash = (hash*17 + name.charCodeAt(i) + 3) >>> 0; }
+    return DEFAULT_BALLOON_COLORS[hash % DEFAULT_BALLOON_COLORS.length];
+  }
+  function colorFor(rider){
+    return rider.color || defaultColorFor(rider.name);
+  }
+
+  // ---------- DOM refs ----------
+  const el = {
+    weekSelect: document.getElementById('weekSelect'),
+    prevWeek: document.getElementById('prevWeek'),
+    nextWeek: document.getElementById('nextWeek'),
+    bedField: document.getElementById('bedField'),
+    trackEmpty: document.getElementById('trackEmpty'),
+    lastWeekLabel: document.getElementById('lastWeekLabel'),
+    podium: document.getElementById('podium'),
+    toteWeekLabel: document.getElementById('toteWeekLabel'),
+    toteBoard: document.getElementById('toteBoard'),
+  };
+
+  // ---------- Week selector ----------
+  function buildWeekOptions(){
+    const currentKey = weekKeyFromDate(new Date());
+    const keys = new Set();
+    // Alle uger fra START_WEEK_KEY og frem til i dag — ingen 11-ugers loft
+    // længere, så ingen uger forsvinder igen, og næste uge dukker automatisk
+    // op af sig selv, når den kommer.
+    let cursor = START_WEEK_KEY;
+    let guard = 0;
+    while(cursor <= currentKey && guard < 520){
+      keys.add(cursor);
+      cursor = shiftWeekKey(cursor, 1);
+      guard++;
+    }
+    keys.add(currentKey);
+    state.sessions.forEach(s => { if(s.weekKey >= START_WEEK_KEY) keys.add(s.weekKey); });
+    if(state.selectedWeekKey >= START_WEEK_KEY) keys.add(state.selectedWeekKey);
+    const sorted = Array.from(keys).sort().reverse();
+
+    const prevValue = el.weekSelect.value;
+    el.weekSelect.innerHTML = '';
+    sorted.forEach(key => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = weekRangeLabel(key) + (key === currentKey ? ' (denne uge)' : '');
+      el.weekSelect.appendChild(opt);
+    });
+    el.weekSelect.value = state.selectedWeekKey;
+    if(el.weekSelect.value !== state.selectedWeekKey && prevValue){
+      el.weekSelect.value = prevValue;
+    }
+  }
+
+  function setSelectedWeek(key){
+    state.selectedWeekKey = key;
+    buildWeekOptions();
+    render();
+  }
+
+  // ---------- Render ----------
+  function render(){
+    renderTrack();
+    renderPodium();
+    renderTote();
+  }
+
+  function aggregateByName(weekKey){
+    const totals = new Map();
+    state.sessions.forEach(s => {
+      if(s.weekKey !== weekKey) return;
+      totals.set(s.name, (totals.get(s.name)||0) + s.minutes);
+    });
+    return totals;
+  }
+
+  function seededUnit(seed){
+    let h = 0;
+    for(let i=0;i<seed.length;i++){ h = (h*31 + seed.charCodeAt(i)) >>> 0; }
+    return (h % 100000) / 100000;
+  }
+
+  function computeBalloonX(riders){
+    const xMin = 10, xMax = 90;
+    const n = riders.length;
+    const ordered = riders.slice().sort((a, b) => seededUnit(a.name + ':slot') - seededUnit(b.name + ':slot'));
+    const slotW = (xMax - xMin) / n;
+    const byName = new Map();
+    ordered.forEach((r, i) => {
+      const cx = xMin + slotW * (i + 0.5);
+      const jitter = (seededUnit(r.name + ':jx') - 0.5) * slotW * 0.6;
+      byName.set(r.name, Math.min(xMax, Math.max(xMin, cx + jitter)));
+    });
+    return byName;
+  }
+
+  function balloonSVG(color, size){
+    const w = size, h = size * 1.5;
+    return '<svg class="balloon-svg" width="'+w+'" height="'+h+'" viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">' +
+      '<ellipse cx="20" cy="22" rx="17" ry="21" fill="'+color+'"/>' +
+      '<path d="M9 30 A17 21 0 0 0 31 30" fill="none" stroke="rgba(0,0,0,0.18)" stroke-width="1.2"/>' +
+      '<line x1="20" y1="1" x2="20" y2="43" stroke="rgba(0,0,0,0.18)" stroke-width="1.2"/>' +
+      '<path d="M13 40 L20 47 L27 40 Z" fill="'+color+'"/>' +
+      '<line x1="14" y1="42" x2="12" y2="52" stroke="#5b3e2b" stroke-width="1.5"/>' +
+      '<line x1="26" y1="42" x2="28" y2="52" stroke="#5b3e2b" stroke-width="1.5"/>' +
+      '<rect x="12" y="52" width="16" height="8" rx="1.5" fill="#a9764f" stroke="#6b4726" stroke-width="1"/>' +
+    '</svg>';
+  }
+
+  function renderTrack(){
+    const totals = aggregateByName(state.selectedWeekKey);
+    const peopleByName = new Map(state.people.map(p => [p.name, p]));
+    const nameSet = new Set(state.people.map(p => p.name));
+    totals.forEach((_, name) => nameSet.add(name));
+    let riders = Array.from(nameSet).map(name => {
+      const person = peopleByName.get(name);
+      return {
+        name,
+        minutes: totals.get(name) || 0,
+        color: person ? person.color : null,
+      };
+    });
+    riders.sort((a,b) => a.name.localeCompare(b.name, 'da'));
+
+    el.bedField.querySelectorAll('.balloon').forEach(n => n.remove());
+    if(riders.length === 0){
+      el.trackEmpty.textContent = state.dataLoaded
+        ? 'Ingen har registreret sig i denne uge endnu.'
+        : 'Henter data…';
+      el.trackEmpty.hidden = false;
+      return;
+    }
+    el.trackEmpty.hidden = true;
+
+    const maxMinutes = Math.max(0, ...riders.map(r => r.minutes));
+    const leaderMinutes = maxMinutes;
+    const xByName = computeBalloonX(riders);
+
+    const groundY = 88, topY = 14, rise = groundY - topY;
+
+    riders.forEach((rider, idx) => {
+      const ratio = maxMinutes > 0 ? rider.minutes / maxMinutes : 0;
+      const isLeading = rider.minutes > 0 && rider.minutes === leaderMinutes;
+      const y = groundY - rise * ratio;
+      const x = xByName.get(rider.name);
+      const size = isLeading ? 52 : 45;
+
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      balloon.style.left = x + '%';
+      balloon.style.top = y + '%';
+
+      const svgWrap = document.createElement('div');
+      svgWrap.style.animationDelay = (idx * 0.18) + 's';
+      svgWrap.innerHTML = balloonSVG(colorFor(rider), size);
+      svgWrap.firstChild.style.animationDelay = (idx * 0.18) + 's';
+
+      const label = document.createElement('div');
+      label.className = 'balloon-label';
+      label.innerHTML =
+        escapeHtml(rider.name) + (isLeading ? ' ⭐' : '') +
+        '<span class="label-time">'+ minutesToLabel(rider.minutes) +'</span>';
+
+      balloon.appendChild(svgWrap);
+      balloon.appendChild(label);
+      el.bedField.appendChild(balloon);
+    });
+  }
+
+  function renderPodium(){
+    const lastWeekKey = shiftWeekKey(state.selectedWeekKey, -1);
+    el.lastWeekLabel.textContent = weekRangeLabel(lastWeekKey);
+
+    const totals = aggregateByName(lastWeekKey);
+    const ranked = Array.from(totals.entries())
+      .map(([name, minutes]) => ({name, minutes}))
+      .sort((a,b) => b.minutes - a.minutes)
+      .slice(0,3);
+
+    el.podium.innerHTML = '';
+    if(ranked.length === 0){
+      const msg = state.dataLoaded ? 'Ingen registreringer i sidste uge.' : 'Henter data…';
+      el.podium.innerHTML = '<p class="podium-empty">' + escapeHtml(msg) + '</p>';
+      return;
+    }
+    const classes = ['gold','silver','bronze'];
+    const medals = ['🥇','🥈','🥉'];
+    ranked.forEach((r, i) => {
+      const spot = document.createElement('div');
+      spot.className = 'podium-spot ' + classes[i];
+      spot.innerHTML =
+        '<span class="medal">'+ medals[i] +'</span>' +
+        '<span class="podium-name">'+ escapeHtml(r.name) +'</span>' +
+        '<span class="podium-time">'+ minutesToLabel(r.minutes) +'</span>' +
+        '<div class="podium-block"></div>';
+      el.podium.appendChild(spot);
+    });
+  }
+
+  function emojiProgressBadge(emoji, value){
+    const whole = Math.max(0, Math.floor(value));
+    const frac = Math.min(1, Math.max(0, value - whole));
+    let html = '<span class="tote-mini-badge">';
+    for(let i=0; i<whole; i++){
+      html += '<span class="badge-emoji">' + emoji + '</span>';
+    }
+    const fillEm = frac.toFixed(2);
+    html += '<span class="emoji-progress">' +
+      '<span class="ep-bg">' + emoji + '</span>' +
+      '<span class="ep-fg" style="width:' + fillEm + 'em"><span class="ep-fg-inner">' + emoji + '</span></span>' +
+      '</span>';
+    html += '</span>';
+    return html;
+  }
+
+  function renderTote(){
+    el.toteWeekLabel.textContent = weekRangeLabel(state.selectedWeekKey);
+    const totals = aggregateByName(state.selectedWeekKey);
+    const riders = Array.from(totals.entries())
+      .map(([name, minutes]) => ({ name, minutes }))
+      .filter(r => r.minutes > 0)
+      .sort((a,b) => b.minutes - a.minutes || a.name.localeCompare(b.name, 'da'));
+
+    el.toteBoard.innerHTML = '';
+    if(riders.length === 0){
+      const msg = state.dataLoaded ? 'Ingen har stået op endnu denne uge.' : 'Henter data…';
+      el.toteBoard.innerHTML = '<p class="tote-empty">' + escapeHtml(msg) + '</p>';
+      return;
+    }
+    riders.forEach(r => {
+      const kcal = r.minutes * 2.2;
+      const cafeLatte = kcal / 195;
+      const km = kcal / 70;
+      const cafeLatteDisplay = cafeLatte.toLocaleString('da-DK', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+      const kmDisplay = km.toLocaleString('da-DK', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+
+      const row = document.createElement('div');
+      row.className = 'tote-row';
+      row.innerHTML =
+        '<span class="tote-row-name">'+ escapeHtml(r.name) +'</span>' +
+        '<div class="tote-row-values">' +
+          '<span class="tote-mini"><span class="tote-mini-badge"></span><strong>'+ Math.round(kcal).toLocaleString('da-DK') +'</strong><small>kcal</small></span>' +
+          '<span class="tote-mini">' + emojiProgressBadge('☕', cafeLatte) + '<strong>'+ cafeLatteDisplay +'</strong><small>café latte</small></span>' +
+          '<span class="tote-mini">' + emojiProgressBadge('🏃', km) + '<strong>'+ kmDisplay +'</strong><small>km løbet</small></span>' +
+        '</div>';
+      el.toteBoard.appendChild(row);
+    });
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ---------- Wire up events ----------
+  el.prevWeek.addEventListener('click', () => setSelectedWeek(shiftWeekKey(state.selectedWeekKey, -1)));
+  el.nextWeek.addEventListener('click', () => setSelectedWeek(shiftWeekKey(state.selectedWeekKey, 1)));
+  el.weekSelect.addEventListener('change', () => setSelectedWeek(el.weekSelect.value));
+
+  // ---------- Init ----------
+  buildWeekOptions();
+  render();
+
+  function attachStore(db){
+    db.collection('people').orderBy('name').onSnapshot(snap => {
+      state.people = snap.docs.map(d => {
+        const data = d.data() || {};
+        return {
+          id: d.id,
+          name: data.name || d.id,
+          color: data.color || null,
+        };
+      });
+      state.dataLoaded = true;
+      render();
+    }, () => {});
+
+    db.collection('sessions').orderBy('date','desc').limit(1000).onSnapshot(snap => {
+      state.sessions = snap.docs.map(d => {
+        const data = d.data() || {};
+        return {
+          id: d.id,
+          name: data.name || '',
+          date: data.date || '',
+          weekKey: data.weekKey || (data.date ? weekKeyFromDateValue(data.date) : ''),
+          startTime: data.startTime || '',
+          endTime: data.endTime || '',
+          minutes: typeof data.minutes === 'number' ? data.minutes : 0,
+        };
+      });
+      state.dataLoaded = true;
+      buildWeekOptions();
+      render();
+    }, () => {});
+  }
+
+  function init(){
+    attachStore(new RemoteStore());
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
